@@ -4,6 +4,7 @@ import hmac
 import ipaddress
 import shutil
 import tempfile
+import time
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
@@ -118,6 +119,10 @@ def _run_pipeline(job: GenerateVideoRequest) -> None:
             animate_image(image_path, clip_path, settings=settings)
             duration = generate_speech(segment.narration, audio_path, voice=settings.tts_voice)
 
+            # Throttle requests between segments to reduce upstream 429 risk.
+            if index < len(script.segments):
+                time.sleep(10)
+
             segment_data.append({"video_path": str(clip_path), "duration": duration})
             audio_paths.append(str(audio_path))
 
@@ -167,6 +172,7 @@ def _run_pipeline(job: GenerateVideoRequest) -> None:
             duration_sec=int(round(duration_sec)),
             error_message=None,
         )
+        print(f"Pipeline complete! job_id={job.job_id}", flush=True)
     except Exception as exc:  # noqa: BLE001
         callback_payload = VideoCompleteCallback(
             job_id=job.job_id,
@@ -176,6 +182,7 @@ def _run_pipeline(job: GenerateVideoRequest) -> None:
             duration_sec=None,
             error_message=str(exc),
         )
+        print(f"Pipeline failed! job_id={job.job_id} error={exc}", flush=True)
     finally:
         try:
             _post_callback(job.callback_url, callback_payload)

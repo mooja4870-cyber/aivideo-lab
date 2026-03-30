@@ -28,5 +28,5 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
   if (!key) {
     return NextResponse.json({ error: "No downloadable video yet." }, { status: 404 });
   }
-  return NextResponse.redirect(buildPublicR2Url(key));
+  return NextResponse.json({ url: buildPublicR2Url(key) });
 }
