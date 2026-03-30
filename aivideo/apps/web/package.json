@@ -1,0 +1,34 @@
+{
+  "name": "@aivideo/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.924.0",
+    "@aws-sdk/s3-request-presigner": "^3.924.0",
+    "@cloudflare/next-on-pages": "^1.13.16",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.84.0",
+    "@tailwindcss/postcss": "^4.1.14",
+    "@tosspayments/tosspayments-sdk": "latest",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.554.0",
+    "next": "15.5.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.14"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.57",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  }
+}

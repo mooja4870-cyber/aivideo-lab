@@ -1,0 +1,2 @@
+"""Video worker application package."""
+

@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+openai
+edge-tts
+Pillow
+imageio
+imageio-ffmpeg
+numpy
+av
+boto3
+pydantic
+python-dotenv
+requests
+mutagen
+httpx
+replicate
+

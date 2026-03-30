@@ -1,0 +1,16 @@
+{
+  "name": "aivideo-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI short-form video SaaS monorepo",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "echo \"TODO: run apps/web dev server\"",
+    "typecheck": "echo \"TODO: add TS typecheck pipeline\"",
+    "lint": "echo \"TODO: add lint pipeline\""
+  }
+}
