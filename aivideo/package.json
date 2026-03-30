@@ -11,6 +11,7 @@
   "scripts": {
     "dev:web": "echo \"TODO: run apps/web dev server\"",
     "typecheck": "echo \"TODO: add TS typecheck pipeline\"",
-    "lint": "echo \"TODO: add lint pipeline\""
+    "lint": "echo \"TODO: add lint pipeline\"",
+    "preflight:deploy": "bash scripts/preflight.sh"
   }
 }

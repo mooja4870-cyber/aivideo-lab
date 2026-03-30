@@ -91,6 +91,20 @@ curl https://<your-railway>.up.railway.app/health
 
 ## 6) Go-Live Validation
 
+사전 점검 자동 실행:
+
+```bash
+cd aivideo
+npm run preflight:deploy
+```
+
+로컬에 아직 실환경 `.env` 파일이 없다면:
+
+```bash
+cd aivideo
+bash scripts/preflight.sh --skip-env
+```
+
 1. `https://<railway-domain>/health` 응답 확인
 2. `https://<pages-domain>` 접속 확인
 3. 로그인 후 영상 생성 요청
