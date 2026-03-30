@@ -28,6 +28,11 @@ aivideo/
 
 Step 6 실행 가이드는 `docs/deployment.md`를 참고하세요.
 
+## CI
+
+- GitHub Actions: `.github/workflows/ci.yml` (master push/PR 시 preflight 자동 실행)
+- 로컬 동일 점검: `npm run preflight:deploy`
+
 ## Strategy Docs
 
 - Cost & pricing baseline: `docs/cost-pricing.md`
