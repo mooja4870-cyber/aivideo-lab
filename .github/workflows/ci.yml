@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,6 +37,10 @@ jobs:
       - name: Install workspace dependencies
         working-directory: aivideo
         run: npm ci
+
+      - name: Enforce PROJECT_STATUS policy
+        working-directory: aivideo
+        run: bash scripts/enforce_project_status.sh --ci
 
       - name: Run deploy preflight (skip env)
         working-directory: aivideo

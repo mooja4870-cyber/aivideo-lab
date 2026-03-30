@@ -1,0 +1,85 @@
+# PROJECT STATUS
+
+최종 업데이트: 2026-03-30 22:48:20 (KST)
+담당: Codex + mooja
+
+## 1) 프로젝트 목적
+
+- 주제 입력만으로 숏폼 영상을 자동 생성하는 SaaS 구축
+- 웹(Next.js) + 워커(FastAPI) 분리 배포
+- 결제/인증/다운로드까지 실제 서비스 흐름 완성
+
+## 2) 현재 상태 (요약)
+
+- Step 0~8 실습 코드 반영 완료
+- Cloudflare Pages 프론트 배포 성공 (nodejs_compat 이슈 해결됨)
+- Railway 백엔드 `/health` 정상 응답 확인
+
+## 3) 최근 핵심 변경
+
+- `aivideo/apps/web/wrangler.toml` 추가
+  - `compatibility_flags = ["nodejs_compat"]`
+  - Pages 배포 시 Node.js compatibility 오류 방지
+- web 의존성 보안/호환성 정리
+  - Next.js 업그레이드 반영
+  - React / React DOM 업그레이드 반영
+
+## 4) 현재 배포 엔드포인트
+
+- Cloudflare Pages(프론트): `https://aivideo-web-18x.pages.dev`
+- Cloudflare Preview 예시: `https://45174d7b.aivideo-web-18x.pages.dev`
+- Railway(백엔드): `https://aivideo-lab-production.up.railway.app`
+- Railway Health: `https://aivideo-lab-production.up.railway.app/health`
+
+## 5) 알려진 이슈 / TODO
+
+- 메타 이미지 URL이 로컬 주소(`127.0.0.1`)를 참조하는 흔적 점검 필요
+- Cloudflare/Railway 환경변수 값 운영 점검(누락/오타 재확인)
+- 배포 전후 체크리스트 문서화 강화 필요
+
+## 6) 작업 규칙 (매우 중요)
+
+아래는 **모든 에이전트/작업자 공통 필수 규칙**입니다.
+
+1. 코드/설정 수정 후 이 파일을 반드시 업데이트한다.
+2. 업데이트 항목:
+   - 무엇을 바꿨는지
+   - 왜 바꿨는지
+   - 배포/테스트 결과
+   - 남은 리스크
+3. 배포 관련 변경(토큰, 빌드, 런타임, 도메인)은 반드시 기록한다.
+4. 이 파일 업데이트 없이 작업 종료 보고를 금지한다.
+
+## 7) 업데이트 템플릿
+
+아래 블록을 복사해서 맨 아래에 누적 기록한다.
+
+```md
+### YYYY-MM-DD HH:MM (KST)
+- 변경: 
+- 이유: 
+- 검증: 
+- 배포 영향: 
+- 남은 TODO: 
+```
+
+### 2026-03-30 22:36 (KST)
+- 변경: 스타터 요금 24,900원 -> 29,900원 조정
+- 이유: 요청 가격 정책 반영
+- 검증: web 가격 상수 및 비용 문서 값 동기화 확인
+- 배포 영향: 프론트 가격 표기/결제 요청 금액 기준에 반영
+- 남은 TODO: 배포 후 결제 테스트로 스타터 금액(29,900원) 실동작 확인
+
+### 2026-03-30 22:43:17 (KST)
+- 변경: 스타터 요금 변경 커밋/푸시 완료 (`c2f95b6`, `origin/master`)
+- 이유: 운영 가격을 29,900원으로 상향 요청 반영
+- 검증: `constants.ts`와 `cost-pricing.md` 값 일치 확인
+- 배포 영향: 소스는 반영됨. Cloudflare 최종 배포는 토큰 환경변수 셸 상태에 따라 수동 실행 확인 필요
+- 남은 TODO: 배포 완료 후 운영 URL에서 `₩29,900` 노출 확인
+
+### 2026-03-30 22:48:20 (KST)
+- 변경: `PROJECT_STATUS.md` 업데이트를 강제하는 자동 규칙 추가
+- 이유: “규칙 누락”이 아니라 “강제 집행” 상태로 운영하기 위함
+- 검증: 로컬 pre-commit 훅 경로 설정(`core.hooksPath=.githooks`) 및 검사 스크립트 추가 확인
+- 배포 영향: CI에서 상태문서 누락 변경은 실패 처리됨
+- 남은 TODO: 다음 커밋부터 정책 위반 케이스/정상 케이스 각각 1회 점검
