@@ -1,0 +1,8 @@
+openai>=1.40.0
+moviepy>=1.0.3,<3
+gTTS>=2.5.1
+Pillow>=10.4.0
+requests>=2.32.0
+imageio-ffmpeg>=0.5.1
+python-dotenv>=1.0.1
+Flask>=3.0.3

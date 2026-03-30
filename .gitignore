@@ -19,6 +19,8 @@ venv/
 *.wav
 output/
 _legacy/
+!aivideo/_legacy/
+!aivideo/_legacy/**
 
 # IDE
 .vscode/
