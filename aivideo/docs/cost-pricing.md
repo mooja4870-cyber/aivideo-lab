@@ -19,7 +19,7 @@ To avoid negative margin at scale, pricing is set above 1,900 KRW per generated 
 
 | Plan | Credits | Price (KRW) | KRW / Video |
 | --- | ---: | ---: | ---: |
-| Starter | 10 | 24,900 | 2,490 |
+| Starter | 10 | 29,900 | 2,990 |
 | Pro | 30 | 69,900 | 2,330 |
 | Scale | 80 | 179,000 | 2,238 |
 
