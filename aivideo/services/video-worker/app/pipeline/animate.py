@@ -8,7 +8,10 @@ import requests
 
 from ..config import Settings, get_settings
 
-ANIMATION_PROMPT = "Realistic daily life scene, natural human movement, documentary style"
+ANIMATION_PROMPT = (
+    "Realistic daily life, natural human movement, documentary style, "
+    "Korean people in real everyday life scene, photorealistic DSLR look"
+)
 
 
 def _extract_video_url(result: Any) -> str:
@@ -46,7 +49,7 @@ def animate_image(image_path: str | Path, output_path: str | Path, settings: Set
         try:
             with source.open("rb") as file_handle:
                 result = client.run(
-                    "google/veo-3.1-fast",
+                    cfg.replicate_video_model,
                     input={
                         "first_frame_image": file_handle,
                         "prompt": ANIMATION_PROMPT,
@@ -66,4 +69,3 @@ def animate_image(image_path: str | Path, output_path: str | Path, settings: Set
                 time.sleep(15)
 
     raise RuntimeError(f"Image animation failed after retries: {last_error}")
-

@@ -18,8 +18,8 @@ INJECTION_PATTERNS = (
 
 SCENE_COUNT = 6
 PHOTO_STYLE_SUFFIX = (
-    "Korean person, photorealistic DSLR, Canon EOS R5, 85mm lens, "
-    "natural lighting, detailed skin texture, documentary realism"
+    "Korean people, photorealistic DSLR photography, real everyday life scene, "
+    "Canon EOS R5, 85mm lens, natural lighting, ultra realistic, documentary realism"
 )
 
 
@@ -76,8 +76,9 @@ def _build_messages(topic: str, language: str) -> list[dict[str, str]]:
         "}\n"
         f"Rules:\n"
         f"- Exactly {SCENE_COUNT} segments.\n"
-        "- Image prompts must be English and include a Korean person.\n"
-        "- Visual style must be photorealistic DSLR using Canon EOS R5 85mm.\n"
+        "- Image prompts must be English and include Korean people.\n"
+        "- Visual style must explicitly include photorealistic DSLR photography and real everyday life scene.\n"
+        "- Add Canon EOS R5, 85mm lens, natural lighting, ultra realistic to every visual prompt.\n"
         "- Keep all spoken lines in the requested language.\n"
         "- Do not include markdown fences."
     )

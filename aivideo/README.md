@@ -20,9 +20,15 @@ aivideo/
 - Step 3: video-worker pipeline + FastAPI implemented
 - Step 4: frontend + edge routes + payment routes scaffolded
 - Step 5: OWASP-focused security hardening applied
-- Step 6: deployment preparation + legacy separation in progress
+- Step 6: deployment preparation + legacy separation completed
+- Step 7: debugging fixes for download flow and worker reliability completed
+- Step 8: photorealistic Korean style tuning + cost/pricing + roadmap docs completed
 
 ## Deploy Guide
 
 Step 6 실행 가이드는 `docs/deployment.md`를 참고하세요.
 
+## Strategy Docs
+
+- Cost & pricing baseline: `docs/cost-pricing.md`
+- Post-MVP roadmap: `docs/roadmap.md`

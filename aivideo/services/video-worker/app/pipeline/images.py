@@ -8,7 +8,10 @@ import requests
 
 from ..config import Settings, get_settings
 
-IMAGE_STYLE_SUFFIX = "photorealistic DSLR, Canon EOS R5, natural lighting"
+IMAGE_STYLE_SUFFIX = (
+    "Korean people, photorealistic DSLR photography, real everyday life scene, "
+    "Canon EOS R5, 85mm lens, natural lighting, ultra realistic"
+)
 
 
 def _download_to_path(url: str, output_path: Path) -> None:
@@ -54,4 +57,3 @@ def generate_image(prompt: str, output_path: str | Path, settings: Settings | No
                 time.sleep(2 ** (attempt - 1))
 
     raise RuntimeError(f"Image generation failed after retries: {last_error}")
-

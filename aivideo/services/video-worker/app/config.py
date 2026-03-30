@@ -40,6 +40,7 @@ class Settings:
     font_path: str
     llm_model: str
     tts_voice: str
+    replicate_video_model: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -64,6 +65,7 @@ class Settings:
             font_path=os.getenv("FONT_PATH", "/Library/Fonts/NotoSansKR-Regular.ttf"),
             llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
             tts_voice=os.getenv("TTS_VOICE", "ko-KR-SunHiNeural"),
+            replicate_video_model=os.getenv("REPLICATE_VIDEO_MODEL", "google/veo-3.1-fast"),
         )
 
 

@@ -10,7 +10,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 from ..config import Settings, get_settings
 
-THUMBNAIL_STYLE = "photorealistic DSLR, Canon EOS R5, natural lighting"
+THUMBNAIL_STYLE = (
+    "Korean person, photorealistic DSLR photography, "
+    "Canon EOS R5, 85mm lens, natural lighting, ultra realistic"
+)
 CANVAS_SIZE = (1792, 1024)
 TEXT_COLOR = (255, 228, 56, 255)
 SHADOW_COLOR = (0, 0, 0, 190)
@@ -91,4 +94,3 @@ def create_thumbnail(
 
     image.convert("RGB").save(destination, format="PNG")
     return str(destination)
-
