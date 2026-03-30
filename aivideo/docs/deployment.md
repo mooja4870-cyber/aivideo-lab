@@ -1,49 +1,37 @@
-# Step 6 Deployment Guide
+# Deployment Guide (Step 0~8 Final)
 
-이 문서는 Step 6 체크리스트를 그대로 실행할 수 있게 정리한 배포 가이드입니다.
+이 문서는 현재 저장소 상태(디렉터리: `aivideo/...`) 기준의 배포 가이드입니다.
 
 ## 1) Supabase
 
-1. Supabase에서 새 프로젝트 생성 (Region: Seoul 권장)
-2. SQL Editor에서 아래 파일 순서대로 실행
-   - `packages/shared/src/db-schema.sql`
-   - `packages/shared/src/db-schema-payments.sql`
-3. Auth URL 설정
+1. Supabase 프로젝트 생성 (Region: Seoul 권장)
+2. SQL Editor에서 아래 순서로 실행
+   - `aivideo/packages/shared/src/db-schema.sql`
+   - `aivideo/packages/shared/src/db-schema-payments.sql`
+3. Auth 설정
    - Site URL: `https://<your-app>.pages.dev`
    - Redirect URLs: `https://<your-app>.pages.dev/**`
-4. Providers에서 Google OAuth 활성화
+4. 필요한 OAuth Provider 활성화
 
 ## 2) Cloudflare R2
 
-1. bucket 생성: `aivideo`
-2. R2 API Token 발급 (Object Read & Write)
-3. 값 확보
+1. Bucket 생성: `aivideo`
+2. R2 Token 발급 (Object Read + Write)
+3. 값 준비
    - `R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com`
    - `R2_ACCESS_KEY_ID`
    - `R2_SECRET_ACCESS_KEY`
    - `R2_BUCKET=aivideo`
+4. Public Base URL 준비
+   - 예: `https://pub.<your-domain>` 또는 Cloudflare Public URL
 
-## 3) GitHub Push
-
-Step 0 프로토타입은 이미 `_legacy/`로 이동되어 있습니다.
-
-권장 커맨드:
-
-```bash
-git add .
-git commit -m "step6: prepare deployment structure and move legacy prototype"
-git remote remove origin
-git remote add origin https://github.com/<your-id>/<your-repo>.git
-git push -u origin main
-```
-
-## 4) Railway (services/video-worker)
+## 3) Railway (Video Worker)
 
 1. Railway에서 GitHub repo 연결
-2. Root Directory: `services/video-worker`
+2. Root Directory: `aivideo/services/video-worker`
 3. Builder: `Dockerfile`
-4. 환경변수 입력 (아래 Worker env 표 참고)
-5. Domain 생성 후 확인
+4. Environment Variables 입력 (아래 Worker env 목록)
+5. Domain 발급 후 health 확인
 
 ```bash
 curl https://<your-railway>.up.railway.app/health
@@ -55,18 +43,18 @@ curl https://<your-railway>.up.railway.app/health
 {"status":"ok"}
 ```
 
-## 5) Cloudflare Pages (apps/web)
+## 4) Cloudflare Pages (Web)
 
 1. Pages -> Connect to Git
-2. Root directory: `apps/web`
+2. Root Directory: `aivideo/apps/web`
 3. Build command: `npx @cloudflare/next-on-pages`
-4. Build output: `.vercel/output/static`
-5. Environment variables 입력 (아래 Web env 표 참고)
-6. Functions compatibility flags: `nodejs_compat`
+4. Build output directory: `.vercel/output/static`
+5. Environment Variables 입력 (아래 Web env 목록)
+6. Compatibility flags: `nodejs_compat`
 
-## 6) Environment Variables
+## 5) Environment Variables
 
-### Web (`apps/web/.env.example`)
+### Web (`aivideo/apps/web/.env.example`)
 
 - `NEXT_PUBLIC_APP_URL`
 - `NEXT_PUBLIC_SUPABASE_URL`
@@ -83,9 +71,9 @@ curl https://<your-railway>.up.railway.app/health
 - `TOSS_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_TOSS_CLIENT_KEY`
 
-### Worker (`services/video-worker/.env.example`)
+### Worker (`aivideo/services/video-worker/.env.example`)
 
-- `WORKER_SECRET` (필수, 미설정 시 시작 실패)
+- `WORKER_SECRET` (필수)
 - `ALLOWED_CALLBACK_HOSTS`
 - `OPENAI_API_KEY`
 - `REPLICATE_API_TOKEN`
@@ -95,15 +83,23 @@ curl https://<your-railway>.up.railway.app/health
 - `R2_BUCKET`
 - `LLM_MODEL`
 - `TTS_VOICE`
+- `REPLICATE_VIDEO_MODEL` (기본: `google/veo-3.1-fast`)
 - `VIDEO_WIDTH`
 - `VIDEO_HEIGHT`
 - `FPS`
 - `FONT_PATH`
 
-## 7) Final Validation
+## 6) Go-Live Validation
 
-- `https://<railway-domain>/health` 응답 확인
-- `https://<pages-domain>` 랜딩 페이지 확인
-- 회원가입/로그인 확인
-- Supabase `users` 테이블 생성 확인
+1. `https://<railway-domain>/health` 응답 확인
+2. `https://<pages-domain>` 접속 확인
+3. 로그인 후 영상 생성 요청
+4. Railway 로그에서 `Pipeline complete! job_id=...` 확인
+5. 대시보드 완료 상태 확인
+6. 다운로드 버튼 클릭 시 실제 mp4 다운로드 확인
 
+## 7) Troubleshooting Quick Notes
+
+- Railway healthcheck 실패 시 Dockerfile의 `CMD`가 shell form인지 확인
+- Replicate `429` 발생 시 현재 코드처럼 세그먼트 간 대기 + 재시도로 완화
+- 다운로드 문제 시 `/api/download/[id]`가 JSON `{ url }` 반환하는지 확인
