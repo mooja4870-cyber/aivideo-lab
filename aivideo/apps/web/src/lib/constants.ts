@@ -9,7 +9,7 @@ export const SUPPORTED_LANGUAGES = [
 export const PRICING_TIERS = [
   { id: "starter", name: "스타터", credits: 10, priceKrw: 29900 },
   { id: "pro", name: "프로", credits: 30, priceKrw: 69900 },
-  { id: "scale", name: "스케일", credits: 80, priceKrw: 179000 }
+  { id: "scale", name: "스케일", credits: 80, priceKrw: 199000 }
 ] as const;
 
 export const API_FALLBACKS = {

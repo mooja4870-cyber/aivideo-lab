@@ -21,7 +21,7 @@ To avoid negative margin at scale, pricing is set above 1,900 KRW per generated 
 | --- | ---: | ---: | ---: |
 | Starter | 10 | 29,900 | 2,990 |
 | Pro | 30 | 69,900 | 2,330 |
-| Scale | 80 | 179,000 | 2,238 |
+| Scale | 80 | 199,000 | 2,488 |
 
 ## Notes
 
