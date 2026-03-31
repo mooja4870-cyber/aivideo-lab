@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 09:25:57 (KST)
+최종 업데이트: 2026-03-31 09:37:18 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -111,3 +111,10 @@
 - 검증: `npx @cloudflare/next-on-pages` 성공, `npx wrangler pages deploy .vercel/output/static --project-name aivideo-web --branch master` 성공, `deployment list` 최신 Production 확인, 운영 URL HTML에서 `₩24,900` 확인
 - 배포 영향: `https://aivideo-web-18x.pages.dev`가 스타터 24,900원 기준으로 갱신됨
 - 남은 TODO: 결제 플로우에서 스타터 선택 시 결제 요청 금액 24,900원 최종 확인
+
+### 2026-03-31 09:37:18 (KST)
+- 변경: 로그인 폼 네트워크 예외 처리 강화 (`aivideo/apps/web/src/components/auth-form.tsx`, `aivideo/apps/web/src/lib/supabase/client.ts`)
+- 이유: 이메일 링크 로그인 시 `Failed to fetch` 오류가 사용자에게 그대로 노출되고 재시도 없이 실패하던 문제를 재발 방지하기 위함
+- 검증: `npm run typecheck` 통과, 설정 누락/타임아웃/네트워크 오류에 대해 사용자 안전 메시지 처리 및 1회 자동 재시도 로직 반영 확인
+- 배포 영향: 로그인 실패 메시지가 친화적으로 변경되고, 일시적 네트워크 오류 시 자동 재시도로 성공 가능성이 높아짐 (커밋/푸시 후 배포 반영 예정)
+- 남은 TODO: 운영 URL에서 이메일 링크 로그인 실사용 테스트(정상/네트워크 불안정 케이스) 최종 확인
