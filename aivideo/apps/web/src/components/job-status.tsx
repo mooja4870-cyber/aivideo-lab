@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getClientConfigError } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import type { JobStatus as JobStatusType } from "@/lib/types";
 
@@ -14,9 +14,19 @@ const STEP_LABEL: Record<JobStatusType, string> = {
 
 export function JobStatus({ jobId, initialStatus }: { jobId: string; initialStatus: JobStatusType }) {
   const [status, setStatus] = useState<JobStatusType>(initialStatus);
-  const supabase = createClient();
+  const [configError] = useState(() => getClientConfigError());
+  const [supabase] = useState(() => {
+    if (configError) {
+      return null;
+    }
+    return createClient();
+  });
 
   useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
     const channel = supabase
       .channel(`jobs-${jobId}`)
       .on(
@@ -52,7 +62,7 @@ export function JobStatus({ jobId, initialStatus }: { jobId: string; initialStat
         <li>4. 영상 합성</li>
         <li>5. 업로드 및 완료</li>
       </ol>
+      {configError ? <p className="mt-3 text-xs text-[var(--muted)]">실시간 상태 연결이 비활성화되었습니다.</p> : null}
     </section>
   );
 }
-

@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 09:58:54 (KST)
+최종 업데이트: 2026-03-31 10:03:13 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -132,3 +132,10 @@
 - 검증: `npm run typecheck` 통과, `bash scripts/preflight.sh`에서 플레이스홀더 Supabase 값을 `[FAIL]`로 즉시 차단 확인
 - 배포 영향: 잘못된 Supabase 설정에서는 로그인 버튼이 비활성화되고 설정 오류 메시지를 즉시 표시함 (커밋/푸시 후 배포 반영 예정)
 - 남은 TODO: 실제 운영용 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`로 배포 후 이메일 링크 로그인 정상 동작 확인
+
+### 2026-03-31 10:03:13 (KST)
+- 변경: 로그인 요청 경로를 서버 라우트 기반으로 전환 (`aivideo/apps/web/src/app/api/auth/email-link/route.ts`, `aivideo/apps/web/src/app/api/auth/oauth/route.ts`, `aivideo/apps/web/src/components/auth-form.tsx`, `aivideo/apps/web/src/components/job-status.tsx`)
+- 이유: 클라이언트 번들에 포함된 Supabase 플레이스홀더 값 때문에 인증 요청이 실패하던 구조를 제거하고, 서버 환경변수 기반으로 인증을 안정화하기 위함
+- 검증: `npm run typecheck` 통과, 로그인 폼이 `/api/auth/email-link` 및 `/api/auth/oauth`를 호출하도록 코드 경로 전환 확인
+- 배포 영향: 클라이언트 공개 Supabase 값이 잘못되어도 이메일/OAuth 로그인은 서버 라우트를 통해 처리됨 (커밋/푸시 후 배포 반영 예정)
+- 남은 TODO: 운영 URL에서 이메일 링크 로그인 실제 성공 및 Google/Kakao 리디렉션 동작 최종 확인

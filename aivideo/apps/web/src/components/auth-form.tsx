@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, startTransition } from "react";
-import { useRouter } from "next/navigation";
-import { createClient, getClientConfigError } from "@/lib/supabase/client";
+import { startTransition, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AUTH_TIMEOUT_MS = 12000;
 const AUTH_RETRY_DELAY_MS = 400;
+
+type AuthApiResponse = {
+  error?: string;
+  ok?: boolean;
+  url?: string;
+};
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -62,34 +67,70 @@ async function runAuthRequest<T>(request: () => Promise<T>) {
   }
 }
 
+function getSafeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/")) {
+    return "/dashboard";
+  }
+  return value;
+}
+
+async function postAuthJson(path: string, payload: Record<string, string>) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AUTH_TIMEOUT_MS);
+  try {
+    const response = await fetch(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    const parsed = (await response.json().catch(() => null)) as Record<string, unknown> | null;
+    if (!response.ok) {
+      if (typeof parsed?.error === "string" && parsed.error) {
+        throw new Error(parsed.error);
+      }
+      throw new Error(`요청 실패 (${response.status})`);
+    }
+
+    return {
+      error: typeof parsed?.error === "string" ? parsed.error : undefined,
+      ok: parsed?.ok === true,
+      url: typeof parsed?.url === "string" ? parsed.url : undefined
+    } satisfies AuthApiResponse;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("AUTH_TIMEOUT");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function AuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const configError = getClientConfigError();
-  const visibleMessage = message || configError || "";
+  const nextPath = getSafeNextPath(searchParams.get("next"));
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault();
-    if (configError) {
-      setMessage(configError);
-      return;
-    }
-
     setLoading(true);
     setMessage("");
     try {
-      const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback`;
       const { error } = await runAuthRequest(() =>
-        supabase.auth.signInWithOtp({
+        postAuthJson("/api/auth/email-link", {
           email: email.trim(),
-          options: { emailRedirectTo: redirectTo }
+          next: nextPath
         })
       );
       if (error) {
-        setMessage(toUserSafeAuthError(error.message, "로그인 링크 전송 실패"));
+        setMessage(toUserSafeAuthError(error, "로그인 링크 전송 실패"));
         return;
       }
       setMessage("로그인 링크를 이메일로 보냈습니다. 메일함(스팸함 포함)을 확인해주세요.");
@@ -105,23 +146,26 @@ export function AuthForm() {
   }
 
   async function signInWithProvider(provider: "google" | "kakao") {
-    if (configError) {
-      setMessage(configError);
-      return;
-    }
-
     setLoading(true);
     setMessage("");
     try {
-      const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback`;
-      const { error } = await runAuthRequest(() =>
-        supabase.auth.signInWithOAuth({ provider, options: { redirectTo } })
+      const { error, url } = await runAuthRequest(() =>
+        postAuthJson("/api/auth/oauth", {
+          provider,
+          next: nextPath
+        })
       );
       if (error) {
         const providerLabel = provider === "google" ? "Google" : "Kakao";
-        setMessage(toUserSafeAuthError(error.message, `${providerLabel} 로그인 실패`));
+        setMessage(toUserSafeAuthError(error, `${providerLabel} 로그인 실패`));
+        return;
       }
+      if (url) {
+        window.location.assign(url);
+        return;
+      }
+      const providerLabel = provider === "google" ? "Google" : "Kakao";
+      setMessage(`${providerLabel} 로그인 실패: 인증 URL이 비어 있습니다.`);
     } catch (error) {
       const providerLabel = provider === "google" ? "Google" : "Kakao";
       if (error instanceof Error) {
@@ -152,7 +196,7 @@ export function AuthForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.kr"
           />
-          <Button disabled={loading || Boolean(configError)} className="w-full" type="submit">
+          <Button disabled={loading} className="w-full" type="submit">
             이메일 링크로 로그인
           </Button>
         </form>
@@ -160,7 +204,7 @@ export function AuthForm() {
           <Button
             type="button"
             variant="secondary"
-            disabled={loading || Boolean(configError)}
+            disabled={loading}
             onClick={() => startTransition(() => void signInWithProvider("google"))}
           >
             Google 로그인
@@ -168,13 +212,13 @@ export function AuthForm() {
           <Button
             type="button"
             variant="secondary"
-            disabled={loading || Boolean(configError)}
+            disabled={loading}
             onClick={() => startTransition(() => void signInWithProvider("kakao"))}
           >
             Kakao 로그인
           </Button>
         </div>
-        {visibleMessage ? <p className="mt-4 text-sm text-[var(--muted)]">{visibleMessage}</p> : null}
+        {message ? <p className="mt-4 text-sm text-[var(--muted)]">{message}</p> : null}
         <div className="mt-4">
           <Button type="button" variant="ghost" onClick={() => router.push("/")}>
             홈으로 돌아가기
