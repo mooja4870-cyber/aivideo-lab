@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 11:46:44 (KST)
+최종 업데이트: 2026-03-31 13:00:58 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -188,3 +188,10 @@
 - 검증: `wrangler pages deployment list` 최신 Production source `decfdba` 확인, 운영 `/api/auth/email-link` 요청 `429` 및 한글 rate limit 메시지 재확인
 - 배포 영향: `https://aivideo-web-18x.pages.dev`가 최신 커밋 기준 인증 오류 처리 로직으로 동작
 - 남은 TODO: Supabase Auth 이메일 rate limit 정책(시간/횟수)을 운영 문서에 반영하고, 필요 시 임계값 조정 검토
+
+### 2026-03-31 13:00:58 (KST)
+- 변경: 인증 미들웨어 세션 쿠키 판별 로직 수정 및 운영 재배포 (`aivideo/apps/web/src/middleware.ts`, deployment `ee09ee12-aivideo-web-18x.pages.dev`)
+- 이유: Supabase SSR이 생성하는 `sb-<project>-auth-token` 쿠키를 기존 미들웨어가 인식하지 못해, 매직링크 로그인 후 `/dashboard` 접근 시 `/login`으로 되돌아가는 루프를 해소하기 위함
+- 검증: `npm run typecheck` 통과, 운영 `/dashboard` 응답 헤더 점검 시 쿠키 없음은 `307 -> /login`, Supabase 형식 auth 쿠키 포함 시 `200` 확인
+- 배포 영향: 매직링크 세션이 설정된 사용자는 `/dashboard` 접근 시 더 이상 강제 로그인 리다이렉트되지 않음
+- 남은 TODO: Supabase URL Configuration 변경 후 가장 최신 매직링크로 실사용 로그인(메일 클릭) E2E 최종 확인
