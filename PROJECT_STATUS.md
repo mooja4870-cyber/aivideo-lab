@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 10:03:13 (KST)
+최종 업데이트: 2026-03-31 10:04:49 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -139,3 +139,10 @@
 - 검증: `npm run typecheck` 통과, 로그인 폼이 `/api/auth/email-link` 및 `/api/auth/oauth`를 호출하도록 코드 경로 전환 확인
 - 배포 영향: 클라이언트 공개 Supabase 값이 잘못되어도 이메일/OAuth 로그인은 서버 라우트를 통해 처리됨 (커밋/푸시 후 배포 반영 예정)
 - 남은 TODO: 운영 URL에서 이메일 링크 로그인 실제 성공 및 Google/Kakao 리디렉션 동작 최종 확인
+
+### 2026-03-31 10:04:49 (KST)
+- 변경: 로그인 폼 `next` 파라미터 읽기 방식을 `useSearchParams`에서 `window.location.search` 파싱으로 수정 (`aivideo/apps/web/src/components/auth-form.tsx`)
+- 이유: `/login` 페이지 빌드 시 Suspense 경계 누락 오류를 제거해 배포 실패를 방지하기 위함
+- 검증: `npm run typecheck` 통과
+- 배포 영향: 로그인 페이지 빌드 안정성 개선 (커밋/푸시 후 배포 반영 예정)
+- 남은 TODO: 배포 후 `/login` 페이지 정상 렌더 및 인증 흐름 재검증

@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +74,14 @@ function getSafeNextPath(value: string | null) {
   return value;
 }
 
+function getSafeNextPathFromWindow() {
+  if (typeof window === "undefined") {
+    return "/dashboard";
+  }
+  const query = new URLSearchParams(window.location.search);
+  return getSafeNextPath(query.get("next"));
+}
+
 async function postAuthJson(path: string, payload: Record<string, string>) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), AUTH_TIMEOUT_MS);
@@ -112,14 +120,13 @@ async function postAuthJson(path: string, payload: Record<string, string>) {
 
 export function AuthForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const nextPath = getSafeNextPath(searchParams.get("next"));
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault();
+    const nextPath = getSafeNextPathFromWindow();
     setLoading(true);
     setMessage("");
     try {
@@ -146,6 +153,7 @@ export function AuthForm() {
   }
 
   async function signInWithProvider(provider: "google" | "kakao") {
+    const nextPath = getSafeNextPathFromWindow();
     setLoading(true);
     setMessage("");
     try {
