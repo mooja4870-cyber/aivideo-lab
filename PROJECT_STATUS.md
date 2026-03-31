@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 09:38:54 (KST)
+최종 업데이트: 2026-03-31 09:58:54 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -125,3 +125,10 @@
 - 검증: `npx @cloudflare/next-on-pages` 성공, `npx wrangler pages deploy .vercel/output/static --project-name aivideo-web --branch master` 성공, `deployment list` 최신 Production 확인
 - 배포 영향: `https://aivideo-web-18x.pages.dev`에 로그인 오류 메시지/재시도 개선 로직 반영됨
 - 남은 TODO: 실제 사용자 환경에서 이메일 링크 로그인 성공/실패 메시지 UX 최종 확인
+
+### 2026-03-31 09:58:54 (KST)
+- 변경: Supabase 플레이스홀더 검증 강화 및 배포 전 차단 로직 추가 (`aivideo/apps/web/src/lib/supabase/client.ts`, `aivideo/apps/web/src/components/auth-form.tsx`, `aivideo/scripts/preflight.sh`)
+- 이유: 운영 번들에 `https://example.supabase.co` / `local-anon-placeholder`가 포함되어 로그인 요청이 실패하며 네트워크 오류가 재발하던 문제를 근본 차단하기 위함
+- 검증: `npm run typecheck` 통과, `bash scripts/preflight.sh`에서 플레이스홀더 Supabase 값을 `[FAIL]`로 즉시 차단 확인
+- 배포 영향: 잘못된 Supabase 설정에서는 로그인 버튼이 비활성화되고 설정 오류 메시지를 즉시 표시함 (커밋/푸시 후 배포 반영 예정)
+- 남은 TODO: 실제 운영용 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`로 배포 후 이메일 링크 로그인 정상 동작 확인

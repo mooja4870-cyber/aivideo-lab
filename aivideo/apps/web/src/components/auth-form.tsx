@@ -18,6 +18,7 @@ function isNetworkErrorMessage(message: string) {
   const normalized = message.toLowerCase();
   return (
     normalized.includes("failed to fetch") ||
+    normalized.includes("fetch failed") ||
     normalized.includes("networkerror") ||
     normalized.includes("load failed")
   );
@@ -66,10 +67,11 @@ export function AuthForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const configError = getClientConfigError();
+  const visibleMessage = message || configError || "";
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault();
-    const configError = getClientConfigError();
     if (configError) {
       setMessage(configError);
       return;
@@ -103,7 +105,6 @@ export function AuthForm() {
   }
 
   async function signInWithProvider(provider: "google" | "kakao") {
-    const configError = getClientConfigError();
     if (configError) {
       setMessage(configError);
       return;
@@ -151,7 +152,7 @@ export function AuthForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.kr"
           />
-          <Button disabled={loading} className="w-full" type="submit">
+          <Button disabled={loading || Boolean(configError)} className="w-full" type="submit">
             이메일 링크로 로그인
           </Button>
         </form>
@@ -159,7 +160,7 @@ export function AuthForm() {
           <Button
             type="button"
             variant="secondary"
-            disabled={loading}
+            disabled={loading || Boolean(configError)}
             onClick={() => startTransition(() => void signInWithProvider("google"))}
           >
             Google 로그인
@@ -167,13 +168,13 @@ export function AuthForm() {
           <Button
             type="button"
             variant="secondary"
-            disabled={loading}
+            disabled={loading || Boolean(configError)}
             onClick={() => startTransition(() => void signInWithProvider("kakao"))}
           >
             Kakao 로그인
           </Button>
         </div>
-        {message ? <p className="mt-4 text-sm text-[var(--muted)]">{message}</p> : null}
+        {visibleMessage ? <p className="mt-4 text-sm text-[var(--muted)]">{visibleMessage}</p> : null}
         <div className="mt-4">
           <Button type="button" variant="ghost" onClick={() => router.push("/")}>
             홈으로 돌아가기

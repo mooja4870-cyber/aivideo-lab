@@ -43,6 +43,30 @@ check_env_file() {
   echo "[OK] Env file validated: $env_file"
 }
 
+check_env_not_placeholder() {
+  local env_file="$1"
+  local key="$2"
+  local value
+  value="$(grep -E "^[[:space:]]*${key}=.*" "$env_file" | tail -n 1 | cut -d= -f2-)"
+  value="${value//\"/}"
+  value="${value//\'/}"
+  local normalized
+  normalized="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
+
+  if [[ -z "$normalized" ]] \
+    || [[ "$normalized" == *"example."* ]] \
+    || [[ "$normalized" == *"placeholder"* ]] \
+    || [[ "$normalized" == *".invalid"* ]] \
+    || [[ "$normalized" == *"changeme"* ]] \
+    || [[ "$normalized" == test_* ]] \
+    || [[ "$normalized" == local-* ]]; then
+    echo "[FAIL] $key in $env_file looks like a placeholder value"
+    return 1
+  fi
+
+  echo "[OK] $key looks valid for deployment"
+}
+
 run_worker_compile_check() {
   echo "[RUN] Python worker compile check"
   PYTHONPYCACHEPREFIX=/tmp/pycache python3 -m py_compile \
@@ -88,6 +112,8 @@ if [[ "$SKIP_ENV_CHECK" -eq 0 ]]; then
     TOSS_SECRET_KEY \
     TOSS_WEBHOOK_SECRET \
     NEXT_PUBLIC_TOSS_CLIENT_KEY
+  check_env_not_placeholder "$ROOT_DIR/apps/web/.env" NEXT_PUBLIC_SUPABASE_URL
+  check_env_not_placeholder "$ROOT_DIR/apps/web/.env" NEXT_PUBLIC_SUPABASE_ANON_KEY
   check_env_file "$ROOT_DIR/services/video-worker/.env" \
     WORKER_SECRET \
     ALLOWED_CALLBACK_HOSTS \
