@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 10:17:33 (KST)
+최종 업데이트: 2026-03-31 11:28:26 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -160,3 +160,17 @@
 - 검증: `deployment list` 최신 Production 반영 확인, `/api/auth/email-link` invalid email 요청은 400 정상, 유효 이메일 요청은 500(`로그인 설정이 올바르지 않습니다`) 확인, `pages secret list` 결과 production 비밀키 목록 비어 있음 확인
 - 배포 영향: 인증 흐름 코드는 운영 반영 완료. 다만 Cloudflare 환경변수 누락으로 이메일 로그인은 아직 실패 상태
 - 남은 TODO: Cloudflare Pages에 `NEXT_PUBLIC_SUPABASE_URL` 또는 `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 또는 `SUPABASE_ANON_KEY`(필수) 값 설정 후 로그인 재검증
+
+### 2026-03-31 11:14:27 (KST)
+- 변경: Cloudflare Pages 환경변수 키 오타 교정 및 재배포 (`NEXT_PUBLIC_SUPABASE_UR` 삭제, `NEXT_PUBLIC_SUPABASE_URL` 추가, deployment `720d56ce-aivideo-web-18x.pages.dev`)
+- 이유: URL 키 이름 오타로 인증 설정을 읽지 못하던 문제를 즉시 복구하기 위함
+- 검증: project API 조회 시 env key가 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`로 교정됨 확인, `/api/auth/email-link` 유효 이메일 요청 결과가 500 -> 400(`Invalid API key`)로 변화 확인
+- 배포 영향: URL 설정 누락 문제는 해소됨. 현재는 `anon` 키 값 불일치/오입력으로 로그인 실패가 지속됨
+- 남은 TODO: Supabase `anon public` 키를 Cloudflare `NEXT_PUBLIC_SUPABASE_ANON_KEY`에 정확히 재입력 후 로그인 API 재검증
+
+### 2026-03-31 11:28:26 (KST)
+- 변경: `keys.md` 기준 Supabase 운영 키를 Cloudflare Pages 프로덕션 secret으로 반영 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)하고 수동 재배포 실행 (`57b82f03-fddd-4d25-80a9-adbc00a76b39`)
+- 이유: 로그인 링크 전송 시 `Invalid API key`가 발생하던 운영 인증 오류를 즉시 복구하기 위함
+- 검증: `wrangler pages secret put` 2건 성공, `npx @cloudflare/next-on-pages` 빌드 성공, `npx wrangler pages deploy .vercel/output/static --project-name aivideo-web --branch master` 성공, 운영 `/api/auth/email-link` 유효 이메일 요청 `200 {"ok":true}` 확인
+- 배포 영향: `https://aivideo-web-18x.pages.dev` 이메일 링크 로그인 API가 정상 상태로 복구됨
+- 남은 TODO: 실제 메일 수신(스팸함 포함) 및 Google/Kakao OAuth provider 설정 최종 확인
