@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 10:13:42 (KST)
+최종 업데이트: 2026-03-31 10:17:33 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -153,3 +153,10 @@
 - 검증: `npm run typecheck` 통과
 - 배포 영향: `/api/auth/email-link`, `/api/auth/oauth`가 더 넓은 env 키 조합에서 정상 동작 (커밋/푸시 후 배포 반영 예정)
 - 남은 TODO: 재배포 후 `/api/auth/email-link` 유효 이메일 요청이 200으로 응답하는지 확인
+
+### 2026-03-31 10:17:33 (KST)
+- 변경: Cloudflare Pages 수동 배포 실행 (`aivideo-web`, source `1c537cd`, deployment `4eb3fe42-df71-40f9-8cec-da846effe1ff`)
+- 이유: 로그인 서버 라우트 전환 + env fallback 수정을 운영 반영하고 실로그인 응답을 검증하기 위함
+- 검증: `deployment list` 최신 Production 반영 확인, `/api/auth/email-link` invalid email 요청은 400 정상, 유효 이메일 요청은 500(`로그인 설정이 올바르지 않습니다`) 확인, `pages secret list` 결과 production 비밀키 목록 비어 있음 확인
+- 배포 영향: 인증 흐름 코드는 운영 반영 완료. 다만 Cloudflare 환경변수 누락으로 이메일 로그인은 아직 실패 상태
+- 남은 TODO: Cloudflare Pages에 `NEXT_PUBLIC_SUPABASE_URL` 또는 `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 또는 `SUPABASE_ANON_KEY`(필수) 값 설정 후 로그인 재검증
