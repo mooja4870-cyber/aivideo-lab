@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 09:23:56 (KST)
+최종 업데이트: 2026-03-31 09:25:57 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -102,5 +102,12 @@
 - 변경: 스타터 요금 29,900원 -> 24,900원 조정 (`aivideo/apps/web/src/lib/constants.ts`, `aivideo/docs/cost-pricing.md`)
 - 이유: 운영 스타터 가격을 24,900원으로 복구 요청 반영
 - 검증: 코드 상수(`priceKrw: 24900`) 및 비용 문서(24,900원/2,490원) 동기화, `aivideo` 경로 내 29,900 검색 0건 확인
-- 배포 영향: 프론트 가격 표기 및 결제 요청 금액 기준이 24,900원으로 변경됨 (커밋/푸시 후 배포 반영 예정)
+- 배포 영향: 프론트 가격 표기 및 결제 요청 금액 기준이 24,900원으로 변경됨 (09:25:57 배포 완료 기록 참조)
 - 남은 TODO: 운영 URL에서 스타터 요금 `₩24,900` 노출 및 결제 금액 24,900원 최종 확인
+
+### 2026-03-31 09:25:57 (KST)
+- 변경: Cloudflare Pages 수동 배포 실행 (`aivideo-web`, source `2c71a05`, deployment `b553b95e-78bc-45dc-9a5a-9f3ccddb9e10`)
+- 이유: 스타터 요금 24,900원 변경사항을 운영 프론트에 즉시 반영하기 위함
+- 검증: `npx @cloudflare/next-on-pages` 성공, `npx wrangler pages deploy .vercel/output/static --project-name aivideo-web --branch master` 성공, `deployment list` 최신 Production 확인, 운영 URL HTML에서 `₩24,900` 확인
+- 배포 영향: `https://aivideo-web-18x.pages.dev`가 스타터 24,900원 기준으로 갱신됨
+- 남은 TODO: 결제 플로우에서 스타터 선택 시 결제 요청 금액 24,900원 최종 확인
