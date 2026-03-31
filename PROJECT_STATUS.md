@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 10:04:49 (KST)
+최종 업데이트: 2026-03-31 10:13:42 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -146,3 +146,10 @@
 - 검증: `npm run typecheck` 통과
 - 배포 영향: 로그인 페이지 빌드 안정성 개선 (커밋/푸시 후 배포 반영 예정)
 - 남은 TODO: 배포 후 `/login` 페이지 정상 렌더 및 인증 흐름 재검증
+
+### 2026-03-31 10:13:42 (KST)
+- 변경: 서버 Supabase 환경변수 fallback 지원 추가 (`aivideo/apps/web/src/lib/supabase/server.ts`)
+- 이유: 운영에서 `NEXT_PUBLIC_SUPABASE_*`가 누락되어도 `SUPABASE_URL`/`SUPABASE_ANON_KEY` 설정으로 인증 API가 동작하도록 복구하기 위함
+- 검증: `npm run typecheck` 통과
+- 배포 영향: `/api/auth/email-link`, `/api/auth/oauth`가 더 넓은 env 키 조합에서 정상 동작 (커밋/푸시 후 배포 반영 예정)
+- 남은 TODO: 재배포 후 `/api/auth/email-link` 유효 이메일 요청이 200으로 응답하는지 확인
