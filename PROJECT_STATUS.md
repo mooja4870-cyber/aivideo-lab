@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 11:42:43 (KST)
+최종 업데이트: 2026-03-31 11:46:44 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -180,4 +180,11 @@
 - 이유: 로그인 링크 전송 실패 시 `email rate limit exceeded` 원문이 그대로 노출되어 사용자 혼란이 반복되던 문제를 방지하기 위함
 - 검증: `npm run typecheck` 통과, 운영 `/api/auth/email-link` 연속 호출 시 `429 {"error":"이메일 전송 요청이 너무 많습니다. 1분 후 다시 시도해주세요."}` 확인
 - 배포 영향: 운영 로그인 화면에서 rate limit 오류가 한글 안내로 표시되며, 이메일 링크 버튼이 60초 쿨다운으로 자동 잠금됨
+- 남은 TODO: Supabase Auth 이메일 rate limit 정책(시간/횟수)을 운영 문서에 반영하고, 필요 시 임계값 조정 검토
+
+### 2026-03-31 11:46:44 (KST)
+- 변경: 커밋(`decfdba`) 기준으로 Cloudflare Pages 재배포 실행 (`faf32f6b-641d-45d8-a3ec-5ff5663b7fdb`)
+- 이유: 배포 목록의 source 해시를 최신 코드와 일치시켜 운영 추적성을 확보하기 위함
+- 검증: `wrangler pages deployment list` 최신 Production source `decfdba` 확인, 운영 `/api/auth/email-link` 요청 `429` 및 한글 rate limit 메시지 재확인
+- 배포 영향: `https://aivideo-web-18x.pages.dev`가 최신 커밋 기준 인증 오류 처리 로직으로 동작
 - 남은 TODO: Supabase Auth 이메일 rate limit 정책(시간/횟수)을 운영 문서에 반영하고, 필요 시 임계값 조정 검토
