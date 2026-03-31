@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "edge";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const RATE_LIMIT_DEFAULT_MESSAGE = "이메일 전송 요청이 너무 많습니다. 1분 후 다시 시도해주세요.";
 
 function toSafeNextPath(value: unknown) {
   if (typeof value !== "string" || !value.startsWith("/")) {
@@ -17,6 +18,16 @@ function toServerErrorMessage(error: unknown) {
     return "로그인 설정이 올바르지 않습니다. 관리자에게 문의해주세요.";
   }
   return "로그인 요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+}
+
+function isRateLimitMessage(message: string) {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("rate limit") ||
+    normalized.includes("too many request") ||
+    normalized.includes("for security purposes") ||
+    normalized.includes("only request this after")
+  );
 }
 
 export async function POST(request: Request) {
@@ -40,6 +51,9 @@ export async function POST(request: Request) {
       }
     });
     if (error) {
+      if (isRateLimitMessage(error.message)) {
+        return NextResponse.json({ error: RATE_LIMIT_DEFAULT_MESSAGE }, { status: 429 });
+      }
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ ok: true });

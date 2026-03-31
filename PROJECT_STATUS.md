@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-최종 업데이트: 2026-03-31 11:28:26 (KST)
+최종 업데이트: 2026-03-31 11:42:43 (KST)
 담당: Codex + mooja
 
 ## 1) 프로젝트 목적
@@ -174,3 +174,10 @@
 - 검증: `wrangler pages secret put` 2건 성공, `npx @cloudflare/next-on-pages` 빌드 성공, `npx wrangler pages deploy .vercel/output/static --project-name aivideo-web --branch master` 성공, 운영 `/api/auth/email-link` 유효 이메일 요청 `200 {"ok":true}` 확인
 - 배포 영향: `https://aivideo-web-18x.pages.dev` 이메일 링크 로그인 API가 정상 상태로 복구됨
 - 남은 TODO: 실제 메일 수신(스팸함 포함) 및 Google/Kakao OAuth provider 설정 최종 확인
+
+### 2026-03-31 11:42:43 (KST)
+- 변경: 이메일 로그인 rate limit 처리 강화 (`aivideo/apps/web/src/app/api/auth/email-link/route.ts`, `aivideo/apps/web/src/components/auth-form.tsx`) 및 수동 재배포 실행 (`36fe8baa-5b75-492e-a1b4-903e7f58ff21`)
+- 이유: 로그인 링크 전송 실패 시 `email rate limit exceeded` 원문이 그대로 노출되어 사용자 혼란이 반복되던 문제를 방지하기 위함
+- 검증: `npm run typecheck` 통과, 운영 `/api/auth/email-link` 연속 호출 시 `429 {"error":"이메일 전송 요청이 너무 많습니다. 1분 후 다시 시도해주세요."}` 확인
+- 배포 영향: 운영 로그인 화면에서 rate limit 오류가 한글 안내로 표시되며, 이메일 링크 버튼이 60초 쿨다운으로 자동 잠금됨
+- 남은 TODO: Supabase Auth 이메일 rate limit 정책(시간/횟수)을 운영 문서에 반영하고, 필요 시 임계값 조정 검토

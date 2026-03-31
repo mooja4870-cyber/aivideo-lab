@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AUTH_TIMEOUT_MS = 12000;
 const AUTH_RETRY_DELAY_MS = 400;
+const EMAIL_COOLDOWN_SEC = 60;
 
 type AuthApiResponse = {
   error?: string;
@@ -29,9 +30,23 @@ function isNetworkErrorMessage(message: string) {
   );
 }
 
+function isRateLimitErrorMessage(message: string) {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("rate limit") ||
+    normalized.includes("too many request") ||
+    normalized.includes("for security purposes") ||
+    normalized.includes("only request this after") ||
+    normalized.includes("이메일 전송 요청이 너무 많습니다")
+  );
+}
+
 function toUserSafeAuthError(message: string, fallback: string) {
   if (message === "AUTH_TIMEOUT") {
     return "인증 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.";
+  }
+  if (isRateLimitErrorMessage(message)) {
+    return "이메일 전송 요청이 너무 많습니다. 1분 후 다시 시도해주세요.";
   }
   if (isNetworkErrorMessage(message)) {
     return "네트워크 연결 또는 인증 서버 접근에 문제가 있습니다. 잠시 후 다시 시도해주세요.";
@@ -123,9 +138,30 @@ export function AuthForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [emailCooldown, setEmailCooldown] = useState(0);
+
+  useEffect(() => {
+    if (emailCooldown <= 0) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setEmailCooldown((previous) => {
+        if (previous <= 1) {
+          window.clearInterval(timer);
+          return 0;
+        }
+        return previous - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [emailCooldown]);
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault();
+    if (emailCooldown > 0) {
+      setMessage(`이메일 전송 제한이 적용 중입니다. ${emailCooldown}초 후 다시 시도해주세요.`);
+      return;
+    }
     const nextPath = getSafeNextPathFromWindow();
     setLoading(true);
     setMessage("");
@@ -137,12 +173,19 @@ export function AuthForm() {
         })
       );
       if (error) {
+        if (isRateLimitErrorMessage(error)) {
+          setEmailCooldown(EMAIL_COOLDOWN_SEC);
+        }
         setMessage(toUserSafeAuthError(error, "로그인 링크 전송 실패"));
         return;
       }
+      setEmailCooldown(EMAIL_COOLDOWN_SEC);
       setMessage("로그인 링크를 이메일로 보냈습니다. 메일함(스팸함 포함)을 확인해주세요.");
     } catch (error) {
       if (error instanceof Error) {
+        if (isRateLimitErrorMessage(error.message)) {
+          setEmailCooldown(EMAIL_COOLDOWN_SEC);
+        }
         setMessage(toUserSafeAuthError(error.message, "로그인 링크 전송 실패"));
       } else {
         setMessage("로그인 링크 전송 실패: 알 수 없는 오류가 발생했습니다.");
@@ -204,8 +247,8 @@ export function AuthForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.kr"
           />
-          <Button disabled={loading} className="w-full" type="submit">
-            이메일 링크로 로그인
+          <Button disabled={loading || emailCooldown > 0} className="w-full" type="submit">
+            {emailCooldown > 0 ? `이메일 링크 재전송 (${emailCooldown}초)` : "이메일 링크로 로그인"}
           </Button>
         </form>
         <div className="mt-3 grid gap-2">
